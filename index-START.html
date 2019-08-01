@@ -6,7 +6,60 @@
 </head>
 <body>
 <canvas id="draw" width="800" height="800"></canvas>
+
 <script>
+  const canvas = document.querySelector('#draw');
+  const ctx = canvas.getContext('2d'); // draw on the context 
+
+  canvas.width = window.innerWidth; // make canvas same width as window
+  canvas.height = window.innerHeight;
+
+  ctx.strokeStyle = 'BADA55';
+  ctx.lineJoin = 'round'; // rounded end of the line 
+  ctx.lineCap = 'round';  
+  ctx.lineWidth = 100;
+  // ctx.globalCompositeOperation = 'multiply'; // blend colors
+
+  let isDrawing = false; // when click down set to true and draw, initial false
+  let lastX = 0; // where start the line from
+  let lastY = 0;
+  let hue = 0;
+  let direction = true;
+
+  function draw(e) {
+    if(!isDrawing) return; // stop the fn from running when not moused/drawing
+    console.log(e);
+    ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+    ctx.lineWidth = hue;
+    ctx.beginPath(); // start a drawing path
+    ctx.moveTo(lastX, lastY); // go to 
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke(); // call stroke() to render line 
+    // lastX = e.offsetX;
+    // lastY = e.offsetY;
+    [lastX, lastY] = [e.offsetX, e.offsetY]; // reduced by destructuring an array
+    
+    hue++; // increment hue
+    if(hue >= 360) {
+      hue = 0;
+    }
+    if(ctx.lineWidth >= 100 || ctx.lineWidth <= 1) { // if greater than 100 or less than 1 flip direction 
+      direction = !direction;
+    }
+    if(direction) {
+      ctx.lineWidth++;
+    } else {
+      ctx.lineWidth--;
+    }
+  }
+
+  canvas.addEventListener('mousemove', draw) // add event with draw callback on mousemove
+  canvas.addEventListener('mousedown', (e) => {
+    isDrawing = true;
+    [lastX, lastY] = [e.offsetX, e.offsetY]; // as soon as mousedown update the last x and last y
+  });
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mouseout', () => isDrawing = false);
 </script>
 
 <style>
